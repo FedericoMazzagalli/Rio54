@@ -18,7 +18,7 @@ La publicación más reciente de GitHub Pages terminó correctamente en Configur
 
 El flujo ahora ejecuta un control adicional con `Tools/verify_pages.py`: comprueba identificadores HTML críticos y duplicados, referencias a recursos locales, manifiesto e iconos PNG, archivos precargados por el service worker, sintaxis JavaScript y estructura de las traducciones (7 idiomas adicionales × 4 expedientes × 4 pistas, con tablero y conclusión).
 
-También ejecuta `Tools/test_browser.py` con Chromium y Playwright: prueba el diseño táctil móvil, los ocho selectores de idioma, el recorrido completo del primer expediente, guardado de progreso y carga offline mediante el service worker. La prueba se ejecuta en cada publicación de Pages y conserva un trace/screenshot cuando falla.
+También ejecuta `Tools/test_browser.py` con Chromium y Playwright: prueba el diseño táctil móvil, los ocho selectores de idioma, los cuatro expedientes y sus dieciséis pistas, tablero y conclusiones, guardado de campaña y carga offline mediante el service worker. La prueba se ejecuta en cada publicación de Pages y conserva un trace/screenshot cuando falla.
 
 La prueba automatizada de navegador se ejecuta ahora dentro de GitHub Actions sobre un servidor local HTTPS-capable (localhost): verifica el recorrido completo en Chromium, el WebGL disponible en el runner y la caché offline del service worker. Las pruebas en teléfonos físicos y en otros navegadores siguen pendientes de confirmación manual.
 

@@ -121,58 +121,84 @@ def main() -> int:
         page.locator("#languageSelect").select_option("es")
         tap("#newGame")
         page.locator("#introScreen.active").wait_for(state="visible", timeout=5_000)
-        case_title = page.locator("#introTitle").inner_text().strip()
-        assert case_title, "first case title is empty"
-        tap("#beginCase")
-        page.locator("#playScreen.active").wait_for(state="visible", timeout=5_000)
-        no_horizontal_overflow("case play screen")
 
-        clue_titles = []
-        for index in range(4):
-            card = page.locator("#leadGrid .leadcard").nth(index)
-            clue_titles.append(card.locator("strong").inner_text().strip())
-            card.tap(timeout=10_000)
-            page.locator("#modalBack.open").wait_for(state="visible", timeout=5_000)
-            choice = page.locator("#modalChoices .modalchoice").first
-            choice.tap(timeout=10_000)
-            page.locator("#modalDone").wait_for(state="visible", timeout=5_000)
-            tap("#modalDone")
-            page.locator("#modalBack.open").wait_for(state="hidden", timeout=5_000)
-            no_horizontal_overflow(f"clue {index + 1} dialog")
+        completed_cases = []
+        clue_total = 0
+        for case_index in range(4):
+            if case_index:
+                tap("#nextCase")
+                page.locator("#introScreen.active").wait_for(state="visible", timeout=5_000)
+            case_id = f"c{case_index + 1}"
+            case_title = page.locator("#introTitle").inner_text().strip()
+            assert case_title, f"case {case_id} title is empty"
+            tap("#beginCase")
+            page.locator("#playScreen.active").wait_for(state="visible", timeout=5_000)
+            no_horizontal_overflow(f"{case_id} play screen")
 
-        assert len(clue_titles) == 4 and all(clue_titles), "not all four clues were opened"
-        assert page.locator("#openBoard").is_enabled(), "evidence board did not unlock after four clues"
-        tap("#openBoard")
-        page.locator("#boardScreen.active").wait_for(state="visible", timeout=5_000)
-        board_index = page.evaluate("cases[0].board.findIndex(item => item.correct)")
-        assert isinstance(board_index, int) and board_index >= 0, "no correct board answer is defined"
-        page.locator(f'input[name="boardchoice"][value="{board_index}"]').check(timeout=5_000)
-        tap("#submitBoard")
-        page.locator("#verdictScreen.active").wait_for(state="visible", timeout=8_000)
+            clue_titles = []
+            for clue_index in range(4):
+                card = page.locator("#leadGrid .leadcard").nth(clue_index)
+                clue_titles.append(card.locator("strong").inner_text().strip())
+                card.tap(timeout=10_000)
+                page.locator("#modalBack.open").wait_for(state="visible", timeout=5_000)
+                page.locator("#modalChoices .modalchoice").first.tap(timeout=10_000)
+                page.locator("#modalDone").wait_for(state="visible", timeout=5_000)
+                tap("#modalDone")
+                page.locator("#modalBack.open").wait_for(state="hidden", timeout=5_000)
+                no_horizontal_overflow(f"{case_id} clue {clue_index + 1}")
 
-        verdict_index = page.evaluate("cases[0].verdict.findIndex(item => item.correct)")
-        assert isinstance(verdict_index, int) and verdict_index >= 0, "no correct verdict answer is defined"
-        page.locator(f'input[name="verdictchoice"][value="{verdict_index}"]').check(timeout=5_000)
-        tap("#submitVerdict")
-        page.locator("#endingScreen.active").wait_for(state="visible", timeout=5_000)
-        grade = page.locator("#endingGrade").inner_text().strip()
-        solved_count = page.evaluate("state.solved.length")
-        assert solved_count == 1, f"expected one solved case, got {solved_count}"
-        assert grade in {"A", "B", "C"}, f"unexpected final grade: {grade}"
+            assert len(clue_titles) == 4 and all(clue_titles), f"not all clues were opened for {case_id}"
+            clue_total += len(clue_titles)
+            assert page.locator("#openBoard").is_enabled(), f"board did not unlock for {case_id}"
+            tap("#openBoard")
+            page.locator("#boardScreen.active").wait_for(state="visible", timeout=5_000)
+            board_index = page.evaluate(
+                "caseId => cases.find(item => item.id === caseId).board.findIndex(item => item.correct)", case_id
+            )
+            assert isinstance(board_index, int) and board_index >= 0, f"no correct board answer for {case_id}"
+            page.locator(f'input[name="boardchoice"][value="{board_index}"]').check(timeout=5_000)
+            tap("#submitBoard")
+            page.locator("#verdictScreen.active").wait_for(state="visible", timeout=8_000)
+
+            verdict_index = page.evaluate(
+                "caseId => cases.find(item => item.id === caseId).verdict.findIndex(item => item.correct)", case_id
+            )
+            assert isinstance(verdict_index, int) and verdict_index >= 0, f"no correct final answer for {case_id}"
+            page.locator(f'input[name="verdictchoice"][value="{verdict_index}"]').check(timeout=5_000)
+            tap("#submitVerdict")
+            page.locator("#endingScreen.active").wait_for(state="visible", timeout=5_000)
+            grade = page.locator("#endingGrade").inner_text().strip()
+            solved_count = page.evaluate("state.solved.length")
+            assert solved_count == case_index + 1, f"expected {case_index + 1} resolved cases, got {solved_count}"
+            assert grade == "A", f"unexpected grade for {case_id}: {grade}"
+            completed_cases.append({
+                "id": case_id,
+                "title": case_title,
+                "clues": clue_titles,
+                "board_correct_index": board_index,
+                "verdict_correct_index": verdict_index,
+                "grade": grade,
+            })
+
+        tap("#nextCase")
+        page.locator("#casesScreen.active").wait_for(state="visible", timeout=5_000)
+        archive_count = page.evaluate("state.solved.length")
+        assert archive_count == 4, f"campaign should finish with four resolved cases, got {archive_count}"
+        tap("#archiveTop")
+        page.locator("#archiveScreen.active").wait_for(state="visible", timeout=5_000)
+        archive_cards = page.locator("#archiveContents .archiveitem").count()
+        assert archive_cards == 4, f"archive should list four resolved cases, got {archive_cards}"
         report["gameplay"] = {
-            "case_title": case_title,
-            "clues_opened": len(clue_titles),
-            "clue_titles": clue_titles,
-            "board_correct_index": board_index,
-            "verdict_correct_index": verdict_index,
-            "grade": grade,
-            "solved_cases": solved_count,
+            "completed_cases": completed_cases,
+            "clues_opened_total": clue_total,
+            "solved_cases": archive_count,
+            "archive_cards": archive_cards,
         }
 
         page.reload(wait_until="load", timeout=20_000)
         page.locator("#newGame").wait_for(state="visible", timeout=10_000)
-        persisted = page.evaluate("state.solved.includes('c1')")
-        assert persisted, "game progress was not restored after page reload"
+        persisted = page.evaluate("['c1','c2','c3','c4'].every(id => state.solved.includes(id))")
+        assert persisted, "completed campaign was not restored after page reload"
         report["gameplay"]["persisted_after_reload"] = persisted
 
         registration = page.evaluate(
@@ -242,17 +268,3 @@ def main() -> int:
                 browser.close()
             except Exception:
                 pass
-        if playwright is not None:
-            try:
-                playwright.stop()
-            except Exception:
-                pass
-        server.shutdown()
-        server.server_close()
-        thread.join(timeout=2)
-        report_path.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
-    return return_code
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())
