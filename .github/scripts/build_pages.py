@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build the RIO54 1.4.0 web/PWA release for GitHub Pages."""
+"""Build the RIO54 1.4.1 web/PWA release for GitHub Pages."""
 from pathlib import Path, PurePosixPath
 import json
 import shutil
@@ -7,7 +7,7 @@ import subprocess
 import tarfile
 
 ROOT = Path.cwd()
-SOURCE = ROOT / "rio54_source_1_4_0.tar.gz"
+SOURCE = ROOT / "rio54_source_1_4_1.tar.gz"
 OUT = ROOT / "_site"
 REQUIRED = (
     "index.html",

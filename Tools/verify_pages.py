@@ -95,6 +95,10 @@ def main() -> None:
     for breakpoint in (850, 560):
         if not re.search(rf"@media\s*\(\s*max-width\s*:\s*{breakpoint}px\s*\)", css):
             fail(f"responsive CSS breakpoint {breakpoint}px is missing")
+    for selector in (".btn{", ".langpick select{", ".option{", ".modalchoice{"):
+        match = re.search(re.escape(selector) + r"([^}]*)}", css)
+        if not match or "min-height:44px" not in match.group(1):
+            fail(f"mobile touch target is smaller than 44px: {selector[:-1]}")
     for rule, description in (
         (".playgrid{grid-template-columns:1fr}", "single-column investigation layout"),
         (".leads,.boardgrid{grid-template-columns:1fr}", "single-column clues and evidence board"),
@@ -125,6 +129,8 @@ def main() -> None:
     for key in ("name", "short_name", "start_url", "scope", "display", "icons"):
         if not manifest.get(key):
             fail(f"PWA manifest has no {key}")
+    if manifest.get("display") != "standalone" or manifest.get("orientation") != "any":
+        fail("manifest must support standalone display and any orientation on mobile")
     for icon in manifest["icons"]:
         icon_path = local_path(root, icon["src"])
         if icon_path is None or not icon_path.is_file():
@@ -187,6 +193,7 @@ process.stdout.write(JSON.stringify({locales:locales.length,cases:cases.length,t
     print("RIO54 Pages QA OK")
     print(f"- HTML: {html_path.stat().st_size:,} bytes; {len(page.ids)} unique IDs; critical game controls present")
     print("- Mobile layout: viewport, 850px/560px breakpoints, single-column panels and dialog sizing")
+    print("- Touch controls: buttons, language selector, clue answers and form choices have 44px minimum height")
     print(f"- Local resource references: {len(page.local_refs)} checked")
     print(f"- PWA: manifest valid; {len(manifest['icons'])} PNG icons; {len(shell_items)} precache items")
     print(f"- Narrative: {translations['locales']} additional locales × {translations['cases']} cases × {translations['translatedClues']} clues; board and verdicts checked")

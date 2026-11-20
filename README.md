@@ -4,7 +4,7 @@ Videojuego narrativo de investigación independiente, inspirado en el archivo y 
 
 ## Estado del proyecto
 
-- **Edición HTML5 1.4.0:** publicada en GitHub Pages.
+- **Edición HTML5 1.4.1:** publicada en GitHub Pages.
 - **Sitio:** https://federicomazzagalli.github.io/Rio54/
 - Campaña: 4 expedientes y 16 indicios.
 - Idiomas: español, inglés, portugués brasileño, francés, alemán, italiano, japonés y chino simplificado.
@@ -21,6 +21,10 @@ El flujo ahora ejecuta un control adicional con `Tools/verify_pages.py`: comprue
 La prueba funcional previa del núcleo de juego comprobó la secuencia completa de pistas, tablero, conclusión y cierre de expediente en Chromium. En esta sesión, el entorno de ejecución bloqueó la navegación automatizada local y el acceso web al dominio público; por eso la apertura real en distintos navegadores, WebGL GPU y el ciclo PWA offline en HTTPS siguen pendientes de confirmación manual.
 
 Para probar la edición web, abrí el [sitio publicado](https://federicomazzagalli.github.io/Rio54/). Para inspeccionar el flujo de publicación, consultá [GitHub Actions](https://github.com/FedericoMazzagalli/Rio54/actions).
+
+## Pruebas en Android
+
+La guía de aceptación para Chrome Android y PWA está en [ANDROID_TESTS_ES.md](ANDROID_TESTS_ES.md). La edición HTML5 se prueba en navegador; no es una APK nativa.
 
 ## Compilación Unity WebGL
 
