@@ -29,6 +29,12 @@ jobs:
         run: python3 .github/scripts/build_pages.py
       - name: Deep QA of HTML5, translations and PWA
         run: python3 Tools/verify_pages.py --site _site
+      - name: Install Playwright Chromium
+        run: |
+          python3 -m pip install --disable-pip-version-check "playwright==1.65.2"
+          python3 -m playwright install --with-deps chromium
+      - name: Browser E2E — Android layout, 8 languages, gameplay and offline PWA
+        run: python3 Tools/test_browser.py --site _site
       - name: Upload site artifact
         uses: actions/upload-pages-artifact@v3
         with:
