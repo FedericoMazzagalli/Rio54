@@ -12,11 +12,13 @@ Videojuego narrativo de investigación independiente, inspirado en el archivo y 
 - PWA: manifiesto, iconos y service worker para instalación y caché offline después de la primera visita.
 - **Unity WebGL:** proyecto fuente 1.4.1 integrado y validado por CI. La compilación del reproductor (.wasm) todavía no está generada.
 
-## Publicación web
+## Publicación web y control de calidad
 
-La ejecución de GitHub Actions del 20 de noviembre de 2026 terminó correctamente en sus etapas Configure Pages, Build, Upload artifact y Deploy. El paquete de Pages se generó e incorporó los archivos HTML, traducciones, renderizador, manifiesto, iconos y service worker.
+La publicación más reciente de GitHub Pages terminó correctamente en Configure Pages, Build, Upload artifact y Deploy. El paquete publicado incluye HTML, traducciones, renderizador, manifiesto, iconos y service worker.
 
-La apertura en navegadores reales, la prueba de aceleración WebGL y la instalación/ejecución offline de PWA siguen pendientes de control manual en dispositivos.
+El flujo ahora ejecuta un control adicional con `Tools/verify_pages.py`: comprueba identificadores HTML críticos y duplicados, referencias a recursos locales, manifiesto e iconos PNG, archivos precargados por el service worker, sintaxis JavaScript y estructura de las traducciones (7 idiomas adicionales × 4 expedientes × 4 pistas, con tablero y conclusión).
+
+La prueba funcional previa del núcleo de juego comprobó la secuencia completa de pistas, tablero, conclusión y cierre de expediente en Chromium. En esta sesión, el entorno de ejecución bloqueó la navegación automatizada local y el acceso web al dominio público; por eso la apertura real en distintos navegadores, WebGL GPU y el ciclo PWA offline en HTTPS siguen pendientes de confirmación manual.
 
 Para probar la edición web, abrí el [sitio publicado](https://federicomazzagalli.github.io/Rio54/). Para inspeccionar el flujo de publicación, consultá [GitHub Actions](https://github.com/FedericoMazzagalli/Rio54/actions).
 
