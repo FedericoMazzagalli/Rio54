@@ -39,7 +39,7 @@ public final class RIO54AndroidSmokeTest {
                     "hasServiceWorker:('serviceWorker' in navigator)})"));
 
             assertEquals("https://appassets.androidplatform.net", page.getString("origin"));
-            assertEquals("https", page.getString("protocol"));
+            assertEquals("https:", page.getString("protocol"));
             assertTrue("The RIO54 page title should be present", page.getString("title").contains("RIO54"));
             assertEquals("es,en,pt-BR,fr,de,it,ja,zh-CN", join(page.getJSONArray("languageOptions")));
             assertTrue("The WebGL canvas should be part of the packaged game", page.getBoolean("hasWebglCanvas"));
