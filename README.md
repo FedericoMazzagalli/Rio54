@@ -10,7 +10,7 @@ Videojuego narrativo de investigación independiente, inspirado en el archivo y 
 - Idiomas: español, inglés, portugués brasileño, francés, alemán, italiano, japonés y chino simplificado.
 - Mecánicas: lectura de fuentes, archivo de indicios, tablero de relaciones y elaboración de conclusiones.
 - PWA: manifiesto, iconos y service worker para instalación y caché offline después de la primera visita.
-- **Unity WebGL:** proyecto fuente 1.4.1 integrado y validado por CI. La compilación del reproductor (.wasm) todavía no está generada.
+- **Unity WebGL:** paquete fuente v1.4 (`rio54_unity_webgl_proyecto_v1_4.zip`); la versión interna declarada del proyecto es 1.3.1. La estructura y los datos están validados por CI, pero la compilación del reproductor (.wasm) todavía no está generada.
 
 ## Publicación web y control de calidad
 
@@ -20,14 +20,14 @@ El flujo ahora ejecuta un control adicional con `Tools/verify_pages.py`: comprue
 
 También ejecuta `Tools/test_browser.py` con Chromium y Playwright: prueba el diseño táctil móvil, los ocho selectores de idioma, los cuatro expedientes y sus dieciséis pistas, tablero y conclusiones, guardado de campaña y carga offline mediante el service worker. La prueba se ejecuta en cada publicación de Pages y conserva un trace/screenshot cuando falla.
 
-La prueba automatizada de navegador se ejecuta ahora dentro de GitHub Actions sobre un servidor local HTTPS-capable (localhost): verifica el recorrido completo en Chromium, el WebGL disponible en el runner y la caché offline del service worker. Las pruebas en teléfonos físicos y en otros navegadores siguen pendientes de confirmación manual.
+La prueba automatizada de navegador se ejecuta ahora dentro de GitHub Actions sobre `localhost`, que Chromium trata como contexto seguro para service workers: verifica el recorrido completo en Chromium, el WebGL disponible en el runner y la caché offline del service worker. Las pruebas en teléfonos físicos y en otros navegadores siguen pendientes de confirmación manual.
 
 Para probar la edición web, abrí el [sitio publicado](https://federicomazzagalli.github.io/Rio54/). Para inspeccionar el flujo de publicación, consultá [GitHub Actions](https://github.com/FedericoMazzagalli/Rio54/actions).
 
 
 ### Última prueba E2E aprobada — 20/11/2026
 
-La ejecución [GitHub Actions #44733342606](https://github.com/FedericoMazzagalli/Rio54/actions/runs/44733342606) completó los **4 expedientes y 16 pistas**, registró cuatro resultados A en el archivo, recuperó el progreso tras recargar y volvió a cargar desde la caché PWA sin conexión. Chromium 159 obtuvo un contexto WebGL y el test terminó con cero errores de consola y cero excepciones JavaScript. Se usó emulación móvil 390 × 844 px y WebGL por software; no es una prueba física Android ni de GPU móvil. El informe detallado está en [QA_BROWSER_E2E_2026-11-20.md](QA_BROWSER_E2E_2026-11-20.md).
+La ejecución [GitHub Actions #44733800308](https://github.com/FedericoMazzagalli/Rio54/actions/runs/44733800308) completó los **4 expedientes y 16 pistas**, registró cuatro resultados A en el archivo, recuperó el progreso tras recargar y volvió a cargar desde la caché PWA sin conexión. Chromium 159 obtuvo un contexto WebGL y el test terminó con cero errores de consola y cero excepciones JavaScript. Se usó emulación móvil 390 × 844 px y WebGL por software; no es una prueba física Android ni de GPU móvil. El informe detallado está en [QA_BROWSER_E2E_2026-11-20.md](QA_BROWSER_E2E_2026-11-20.md).
 
 ## Pruebas en Android
 
