@@ -32,13 +32,27 @@ jobs:
       - name: Install Playwright Chromium
         run: |
           python3 -m pip install --disable-pip-version-check "playwright==1.65.2"
-          python3 -m playwright install --with-deps chromium
+          python3 -m playwright install --with-deps chromium firefox webkit
       - name: Browser E2E — Android layout, 8 languages, gameplay and offline PWA
         run: python3 Tools/test_browser.py --site _site
       - name: Verify browser E2E report
         run: |
           test -s artifacts/rio54-browser-e2e.json
           python3 -c "import json; r=json.load(open('artifacts/rio54-browser-e2e.json', encoding='utf-8')); g=r['gameplay']; assert r['result']=='passed'; assert len(g['completed_cases'])==4; assert g['clues_opened_total']==16; assert g['solved_cases']==4; assert g['archive_cards']==4; assert g['persisted_after_reload'] is True; assert r['pwa']['offline_reload']['hasGame'] is True; assert r['webgl']['canvas'] is True; assert len(r['responsive_matrix'])==5; assert all(x['scrollWidth']<=x['width']+1 for x in r['responsive_matrix']); assert all(x['primary_action_visible'] for x in r['responsive_matrix']); assert r['touch_targets']['minimum_height_px']==44; assert not r['page_errors']; print('Browser E2E report verified: 4 cases, 16 clues, offline PWA, WebGL and 5 viewport profiles.')"
+      - name: Cross-browser smoke test — Firefox and WebKit
+        run: python3 Tools/test_cross_browser.py --site _site
+      - name: Verify Firefox and WebKit smoke report
+        run: |
+          test -s artifacts/rio54-cross-browser.json
+          python3 -c "import json; r=json.load(open('artifacts/rio54-cross-browser.json', encoding='utf-8')); assert r['result']=='passed'; assert [e['name'] for e in r['engines']]==['Firefox','WebKit']; assert all(len(e['viewports'])==3 for e in r['engines']); assert not r['errors']; print('Cross-browser smoke verified: Firefox + WebKit, 3 viewport profiles each.')"
+      - name: Upload cross-browser diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: RIO54-cross-browser-diagnostics
+          path: artifacts/rio54-cross-browser.json
+          if-no-files-found: ignore
+          retention-days: 7
       - name: Upload browser test diagnostics
         if: always()
         uses: actions/upload-artifact@v4
