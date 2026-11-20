@@ -78,6 +78,7 @@ jobs:
           script: |
             adb shell svc wifi disable || true
             adb shell svc data disable || true
+            cd android-build/RIO54_Android_App
             gradle --no-daemon --stacktrace :app:connectedDebugAndroidTest
 
       - name: Upload Android instrumentation reports
