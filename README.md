@@ -71,3 +71,9 @@ La APK es una compilación **debug** para pruebas manuales; no está firmada con
 El paquete Android nativo v0.1.0 está disponible en [android/RIO54_Android_Offline_App_v0_1.zip](android/RIO54_Android_Offline_App_v0_1.zip). Es un contenedor Android WebView que lleva la edición HTML5 1.4.2 dentro del APK, con caché local y soporte de service worker mediante un origen HTTPS local. No es la compilación Unity ni una APK ya verificada en un teléfono físico.
 
 El workflow [RIO54 Android APK](https://github.com/FedericoMazzagalli/Rio54/actions/workflows/android-apk.yml) compila una APK debug con Android 16/API 36. Cuando el workflow termine, su artefacto se llamará `RIO54-Android-debug-APK`. La distribución en Play Store requerirá firma release y pruebas físicas adicionales.
+
+## QA automatizada en emulador Android
+
+El workflow Android ahora añade pruebas instrumentadas en un emulador Android 16/API 36 con conectividad desactivada. Comprueba el origen HTTPS local del WebView, los ocho idiomas, el canvas WebGL, que la APK no solicite permiso de Internet, el inicio de un expediente, el registro de una pista, la persistencia después de recrear la actividad y la activación del service worker con el HTML, las traducciones y el renderizador en caché. Los informes se publican como artefacto de GitHub Actions.
+
+Estas pruebas automatizadas no equivalen a una certificación en un teléfono físico. Siguen pendientes la instalación real, los fabricantes y tamaños de pantalla distintos, Android 8–15, rotación, consumo y rendimiento gráfico móvil.

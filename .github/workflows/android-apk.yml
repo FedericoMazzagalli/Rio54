@@ -1,15 +1,17 @@
-name: RIO54 Android APK
+name: RIO54 Android APK and Emulator QA
 
 on:
   push:
     branches: [main]
     paths:
       - 'android/RIO54_Android_Offline_App_v0_1.zip'
+      - 'android/tests/**'
       - '.github/workflows/android-apk.yml'
   pull_request:
     branches: [main]
     paths:
       - 'android/RIO54_Android_Offline_App_v0_1.zip'
+      - 'android/tests/**'
       - '.github/workflows/android-apk.yml'
   workflow_dispatch:
 
@@ -17,18 +19,20 @@ permissions:
   contents: read
 
 jobs:
-  build-debug-apk:
-    name: Build offline Android debug APK
+  build-and-test-android:
+    name: Build APK and test on Android 16 emulator
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
       - name: Set up JDK 17
         uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '17'
-      - name: Configure preinstalled Android SDK
+
+      - name: Configure Android SDK
         run: |
           SDK_ROOT=/usr/local/lib/android/sdk
           test -x "$SDK_ROOT/cmdline-tools/latest/bin/sdkmanager"
@@ -36,25 +40,63 @@ jobs:
           echo "ANDROID_SDK_ROOT=$SDK_ROOT" >> "$GITHUB_ENV"
           echo "$SDK_ROOT/cmdline-tools/latest/bin" >> "$GITHUB_PATH"
           echo "$SDK_ROOT/platform-tools" >> "$GITHUB_PATH"
-      - name: Accept Android SDK licenses
-        run: yes | sdkmanager --licenses
-      - name: Install Android 16 SDK
-        run: sdkmanager 'platforms;android-36' 'build-tools;36.0.0' 'platform-tools'
+          echo "$SDK_ROOT/emulator" >> "$GITHUB_PATH"
+
+      - name: Accept SDK licenses and install Android 16 components
+        run: |
+          yes | sdkmanager --licenses
+          sdkmanager 'platforms;android-36' 'build-tools;36.0.0' 'platform-tools' 'emulator'
+
       - name: Set up Gradle 9.6.0
         uses: gradle/actions/setup-gradle@v6
         with:
           gradle-version: '9.6.0'
+
       - name: Unpack Android Studio project
         run: unzip -q android/RIO54_Android_Offline_App_v0_1.zip -d android-build
+
+      - name: Add Android instrumentation smoke tests
+        run: python3 android/tests/prepare_instrumentation.py
+
       - name: Validate packaged RIO54 assets and app settings
         working-directory: android-build/RIO54_Android_App
         run: python3 tools/validate_android_assets.py
-      - name: Assemble debug APK
+
+      - name: Assemble debug APK and instrumentation package
         working-directory: android-build/RIO54_Android_App
-        run: gradle --no-daemon --stacktrace :app:assembleDebug
-      - name: Verify APK
+        run: gradle --no-daemon --stacktrace :app:assembleDebug :app:assembleDebugAndroidTest
+
+      - name: Run app on Android 16 emulator with connectivity disabled
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 36
+          target: google_apis
+          arch: x86_64
+          profile: pixel_2
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
+          script: |
+            adb shell svc wifi disable || true
+            adb shell svc data disable || true
+            gradle --no-daemon --stacktrace :app:connectedDebugAndroidTest
+
+      - name: Upload Android instrumentation reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: RIO54-Android-emulator-QA
+          path: |
+            android-build/RIO54_Android_App/app/build/reports/androidTests/connected/**
+            android-build/RIO54_Android_App/app/build/outputs/androidTest-results/connected/**
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Verify debug APK exists
+        if: always()
         run: test -s android-build/RIO54_Android_App/app/build/outputs/apk/debug/app-debug.apk
+
       - name: Upload debug APK
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: RIO54-Android-debug-APK
