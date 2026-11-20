@@ -80,11 +80,11 @@ jobs:
           profile: pixel_2
           disable-animations: true
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
+          emulator-boot-timeout: 900
           script: |
             adb shell svc wifi disable || true
             adb shell svc data disable || true
-            cd android-build/RIO54_Android_App
-            gradle --no-daemon --stacktrace :app:connectedDebugAndroidTest
+            gradle --no-daemon --stacktrace -p android-build/RIO54_Android_App :app:connectedDebugAndroidTest
 
       - name: Upload Android instrumentation reports
         if: always()
