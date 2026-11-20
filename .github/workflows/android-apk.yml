@@ -82,9 +82,30 @@ jobs:
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
           emulator-boot-timeout: 900
           script: |
+            set -euxo pipefail
+            echo "=== ADB DEVICES ==="
+            adb devices -l
+            echo "=== ANDROID BOOT STATE ==="
+            adb shell getprop sys.boot_completed
             adb shell svc wifi disable || true
             adb shell svc data disable || true
-            gradle --no-daemon --stacktrace -p android-build/RIO54_Android_App :app:connectedDebugAndroidTest
+            python3 - <<'PY'
+            import subprocess
+            import sys
+
+            command = [
+                "gradle", "--no-daemon", "--stacktrace", "--info", "--console=plain",
+                "-p", "android-build/RIO54_Android_App",
+                ":app:connectedDebugAndroidTest",
+            ]
+            print("Starting Android instrumented tests from the repository root.", flush=True)
+            try:
+                result = subprocess.run(command, timeout=600, check=False)
+                sys.exit(result.returncode)
+            except subprocess.TimeoutExpired:
+                print("ERROR: connectedDebugAndroidTest exceeded the 600-second test limit.", flush=True)
+                sys.exit(124)
+            PY
 
       - name: Upload Android instrumentation reports
         if: always()
