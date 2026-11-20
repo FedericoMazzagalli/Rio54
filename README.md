@@ -4,7 +4,7 @@ Videojuego narrativo de investigación independiente, inspirado en el archivo y 
 
 ## Estado del proyecto
 
-- **Edición HTML5 1.4.1:** publicada en GitHub Pages.
+- **Edición HTML5 1.4.2:** publicada en GitHub Pages.
 - **Sitio:** https://federicomazzagalli.github.io/Rio54/
 - Campaña: 4 expedientes y 16 indicios.
 - Idiomas: español, inglés, portugués brasileño, francés, alemán, italiano, japonés y chino simplificado.

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build the RIO54 1.4.1 web/PWA release for GitHub Pages."""
+"""Build the RIO54 1.4.2 web/PWA release for GitHub Pages."""
 from pathlib import Path, PurePosixPath
 import json
 import shutil
@@ -7,7 +7,7 @@ import subprocess
 import tarfile
 
 ROOT = Path.cwd()
-SOURCE = ROOT / "rio54_source_1_4_1.tar.gz"
+SOURCE = ROOT / "rio54_source_1_4_2.tar.gz"
 OUT = ROOT / "_site"
 REQUIRED = (
     "index.html",
@@ -63,4 +63,4 @@ for script in ("narrative_translations.js", "webgl_renderer.js", "service-worker
     subprocess.run(["node", "--check", str(OUT / script)], check=True)
 if (OUT / "index.html").stat().st_size < 100_000:
     raise SystemExit("Unexpectedly small index.html; release may be truncated")
-print("RIO54 1.4.1 build OK: HTML, 8-language narrative, responsive touch UI, manifest, icons and offline worker.")
+print("RIO54 1.4.2 build OK: HTML, 8-language narrative, compact responsive UI, touch controls, manifest, icons and offline worker.")

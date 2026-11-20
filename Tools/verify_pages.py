@@ -95,6 +95,10 @@ def main() -> None:
     for breakpoint in (850, 560):
         if not re.search(rf"@media\s*\(\s*max-width\s*:\s*{breakpoint}px\s*\)", css):
             fail(f"responsive CSS breakpoint {breakpoint}px is missing")
+    if "@media (min-width:700px) and (max-height:520px)" not in css:
+        fail("compact landscape layout for low-height screens is missing")
+    if "@media(max-width:380px) and (max-height:820px)" not in css:
+        fail("compact layout for small portrait screens is missing")
     for selector in (".btn{", ".langpick select{", ".option{", ".modalchoice{"):
         match = re.search(re.escape(selector) + r"([^}]*)}", css)
         if not match or "min-height:44px" not in match.group(1):

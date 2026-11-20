@@ -143,6 +143,11 @@ def main() -> int:
                 assert rect["x"] >= -1 and rect["x"] + rect["width"] <= width + 1, (
                     f"{element_name} is clipped at {label}: {rect}"
                 )
+            cta_bottom = metrics["newGame"]["y"] + metrics["newGame"]["height"]
+            metrics["primary_action_visible"] = metrics["newGame"]["y"] >= 0 and cta_bottom <= height
+            assert metrics["primary_action_visible"], (
+                f"primary start action is below the first viewport at {label}: {metrics['newGame']}"
+            )
             responsive_results.append({"profile": label, **metrics})
         page.set_viewport_size({"width": 390, "height": 844})
         report["responsive_matrix"] = responsive_results
