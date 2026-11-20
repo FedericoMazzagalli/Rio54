@@ -22,6 +22,10 @@ La prueba funcional previa del núcleo de juego comprobó la secuencia completa 
 
 Para probar la edición web, abrí el [sitio publicado](https://federicomazzagalli.github.io/Rio54/). Para inspeccionar el flujo de publicación, consultá [GitHub Actions](https://github.com/FedericoMazzagalli/Rio54/actions).
 
+## Pruebas en Android
+
+La guía de aceptación para Chrome Android y PWA está en [ANDROID_TESTS_ES.md](ANDROID_TESTS_ES.md). La edición HTML5 puede probarse en el navegador; no es una APK nativa.
+
 ## Compilación Unity WebGL
 
 El proyecto Unity fuente se encuentra en `unity/rio54_unity_webgl_proyecto_v1_4.zip`. Usa Unity 6.3 LTS, versión 6000.3.0f1.

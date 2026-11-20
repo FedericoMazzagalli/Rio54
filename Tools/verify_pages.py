@@ -87,6 +87,23 @@ def main() -> None:
     html = html_path.read_text(encoding="utf-8")
     page = PageParser()
     page.feed(html)
+    viewport_ok = re.search(r'<meta[^>]+name=["\\']viewport["\\'][^>]+content=["\\'][^"\\']*width=device-width', html, re.I)
+    if not viewport_ok:
+        fail("mobile viewport meta is missing or does not use device width")
+    style_blocks = re.findall(r"<style[^>]*>(.*?)</style>", html, re.I | re.S)
+    css = "\\n".join(style_blocks)
+    for breakpoint in (850, 560):
+        if not re.search(rf"@media\\s*\\(\\s*max-width\\s*:\\s*{breakpoint}px\\s*\\)", css):
+            fail(f"responsive CSS breakpoint {breakpoint}px is missing")
+    for rule, description in (
+        (".playgrid{grid-template-columns:1fr}", "single-column investigation layout"),
+        (".leads,.boardgrid{grid-template-columns:1fr}", "single-column clues and evidence board"),
+        (".casegrid{grid-template-columns:1fr}", "single-column case selection"),
+    ):
+        if rule not in css:
+            fail(f"mobile CSS is missing {description}")
+    if "max-height:min(88vh,850px)" not in css or "width:min(620px,100%)" not in css:
+        fail("responsive clue dialog sizing is missing")
     if not "".join(page.title_text).strip():
         fail("HTML title is empty")
     duplicate_ids = sorted({item for item in page.ids if page.ids.count(item) > 1})
@@ -169,6 +186,7 @@ process.stdout.write(JSON.stringify({locales:locales.length,cases:cases.length,t
 
     print("RIO54 Pages QA OK")
     print(f"- HTML: {html_path.stat().st_size:,} bytes; {len(page.ids)} unique IDs; critical game controls present")
+    print("- Mobile layout: viewport, 850px/560px breakpoints, single-column panels and dialog sizing")
     print(f"- Local resource references: {len(page.local_refs)} checked")
     print(f"- PWA: manifest valid; {len(manifest['icons'])} PNG icons; {len(shell_items)} precache items")
     print(f"- Narrative: {translations['locales']} additional locales × {translations['cases']} cases × {translations['translatedClues']} clues; board and verdicts checked")
