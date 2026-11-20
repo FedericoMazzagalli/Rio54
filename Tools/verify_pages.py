@@ -87,13 +87,13 @@ def main() -> None:
     html = html_path.read_text(encoding="utf-8")
     page = PageParser()
     page.feed(html)
-    viewport_ok = re.search(r'<meta[^>]+name=["\\']viewport["\\'][^>]+content=["\\'][^"\\']*width=device-width', html, re.I)
+    viewport_ok = re.search(r"""<meta[^>]+name=["']viewport["'][^>]+content=["'][^"']*width=device-width""", html, re.I)
     if not viewport_ok:
         fail("mobile viewport meta is missing or does not use device width")
     style_blocks = re.findall(r"<style[^>]*>(.*?)</style>", html, re.I | re.S)
-    css = "\\n".join(style_blocks)
+    css = "\n".join(style_blocks)
     for breakpoint in (850, 560):
-        if not re.search(rf"@media\\s*\\(\\s*max-width\\s*:\\s*{breakpoint}px\\s*\\)", css):
+        if not re.search(rf"@media\s*\(\s*max-width\s*:\s*{breakpoint}px\s*\)", css):
             fail(f"responsive CSS breakpoint {breakpoint}px is missing")
     for rule, description in (
         (".playgrid{grid-template-columns:1fr}", "single-column investigation layout"),
