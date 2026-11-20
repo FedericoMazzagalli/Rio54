@@ -35,6 +35,17 @@ jobs:
           python3 -m playwright install --with-deps chromium
       - name: Browser E2E — Android layout, 8 languages, gameplay and offline PWA
         run: python3 Tools/test_browser.py --site _site
+      - name: Upload browser test diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: RIO54-browser-e2e-diagnostics
+          path: |
+            artifacts/rio54-browser-e2e.json
+            artifacts/rio54-browser-e2e-trace.zip
+            artifacts/rio54-browser-e2e-failure.png
+          if-no-files-found: ignore
+          retention-days: 7
       - name: Upload site artifact
         uses: actions/upload-pages-artifact@v3
         with:
