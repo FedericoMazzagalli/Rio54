@@ -58,3 +58,10 @@ El juego distingue entre observaciones, testimonios, documentos, hipótesis y co
 - Archivo de referencia: https://rio54ovni.blogspot.com/
 - Proyecto independiente, sin afiliación oficial con el autor del blog ni con organismos mencionados.
 - Las traducciones se ofrecen para accesibilidad; para el análisis documental prevalecen las fuentes originales.
+
+
+## Aplicación Android instalable
+
+El paquete Android nativo v0.1.0 está disponible en [android/RIO54_Android_Offline_App_v0_1.zip](android/RIO54_Android_Offline_App_v0_1.zip). Es un contenedor Android WebView que lleva la edición HTML5 1.4.2 dentro del APK, con caché local y soporte de service worker mediante un origen HTTPS local. No es la compilación Unity ni una APK ya verificada en un teléfono físico.
+
+El workflow [RIO54 Android APK](https://github.com/FedericoMazzagalli/Rio54/actions/workflows/android-apk.yml) compila una APK debug con Android 16/API 36. Cuando el workflow termine, su artefacto se llamará `RIO54-Android-debug-APK`. La distribución en Play Store requerirá firma release y pruebas físicas adicionales.
