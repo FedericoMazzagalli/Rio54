@@ -43,7 +43,7 @@ jobs:
 
   build-unity-webgl:
     name: Build Unity WebGL player (.wasm)
-    if: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.build_unity) }}
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.build_unity }}
     needs: validate-unity-source
     runs-on: ubuntu-latest
     steps:
