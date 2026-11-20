@@ -77,3 +77,8 @@ El workflow [RIO54 Android APK](https://github.com/FedericoMazzagalli/Rio54/acti
 El workflow Android ahora añade pruebas instrumentadas en un emulador Android 16/API 36 con conectividad desactivada. Comprueba el origen HTTPS local del WebView, los ocho idiomas, el canvas WebGL, que la APK no solicite permiso de Internet, el inicio de un expediente, el registro de una pista, la persistencia después de recrear la actividad y la activación del service worker con el HTML, las traducciones y el renderizador en caché. Los informes se publican como artefacto de GitHub Actions.
 
 Estas pruebas automatizadas no equivalen a una certificación en un teléfono físico. Siguen pendientes la instalación real, los fabricantes y tamaños de pantalla distintos, Android 8–15, rotación, consumo y rendimiento gráfico móvil.
+
+
+## Preparar una APK Android firmada
+
+Se agregó el workflow manual [RIO54 Android signed release](.github/workflows/android-release.yml), que compila la variante release, firma con la clave privada del propietario y verifica el certificado antes de publicar el artefacto. Antes de ejecutarlo, seguí [ANDROID_RELEASE_ES.md](ANDROID_RELEASE_ES.md) para crear la clave y configurar los cuatro secretos de GitHub Actions. La clave privada nunca debe subirse al repositorio ni compartirse por chat. La prueba en un teléfono físico sigue siendo necesaria.
