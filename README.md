@@ -24,6 +24,11 @@ La prueba automatizada de navegador se ejecuta ahora dentro de GitHub Actions so
 
 Para probar la edición web, abrí el [sitio publicado](https://federicomazzagalli.github.io/Rio54/). Para inspeccionar el flujo de publicación, consultá [GitHub Actions](https://github.com/FedericoMazzagalli/Rio54/actions).
 
+
+### Última prueba E2E aprobada — 20/11/2026
+
+La ejecución [GitHub Actions #44733342606](https://github.com/FedericoMazzagalli/Rio54/actions/runs/44733342606) completó los **4 expedientes y 16 pistas**, registró cuatro resultados A en el archivo, recuperó el progreso tras recargar y volvió a cargar desde la caché PWA sin conexión. Chromium 159 obtuvo un contexto WebGL y el test terminó con cero errores de consola y cero excepciones JavaScript. Se usó emulación móvil 390 × 844 px y WebGL por software; no es una prueba física Android ni de GPU móvil. El informe detallado está en [QA_BROWSER_E2E_2026-11-20.md](QA_BROWSER_E2E_2026-11-20.md).
+
 ## Pruebas en Android
 
 La guía de aceptación para Chrome Android y PWA está en [ANDROID_TESTS_ES.md](ANDROID_TESTS_ES.md). La edición HTML5 se prueba en navegador; no es una APK nativa.
