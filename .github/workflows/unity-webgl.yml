@@ -1,0 +1,95 @@
+name: RIO54 Unity WebGL
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'unity/rio54_unity_webgl_proyecto_v1_3.zip'
+      - '.github/workflows/unity-webgl.yml'
+      - 'Tools/prepare_unity_ci.py'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'unity/rio54_unity_webgl_proyecto_v1_3.zip'
+      - '.github/workflows/unity-webgl.yml'
+      - 'Tools/prepare_unity_ci.py'
+  workflow_dispatch:
+    inputs:
+      build_unity:
+        description: 'Compilar el ejecutable Unity WebGL (.wasm). Requiere el secreto UNITY_LICENSE.'
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+jobs:
+  validate-unity-source:
+    name: Validate Unity source and 8-language campaign
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Safely unpack Unity project
+        run: python3 Tools/prepare_unity_ci.py --archive unity/rio54_unity_webgl_proyecto_v1_3.zip --destination _unity_src
+      - name: Validate project structure and multilingual data
+        working-directory: _unity_src/RIO54_Unity_WebGL
+        run: python3 Tools/validate_project.py
+
+  build-unity-webgl:
+    name: Build Unity WebGL player (.wasm)
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.build_unity }}
+    needs: validate-unity-source
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Safely unpack Unity project
+        run: python3 Tools/prepare_unity_ci.py --archive unity/rio54_unity_webgl_proyecto_v1_3.zip --destination _unity_src
+      - name: Install licensed Noto CJK fonts
+        working-directory: _unity_src/RIO54_Unity_WebGL
+        run: python3 Tools/setup_cjk_fonts.py
+      - name: Check Unity license secret
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+        run: |
+          if [ -z "$UNITY_LICENSE" ]; then
+            echo "::error::Falta el secreto UNITY_LICENSE. Agregá el contenido del archivo .ulf en Settings > Secrets and variables > Actions."
+            exit 1
+          fi
+      - name: Build Unity WebGL with GameCI
+        uses: game-ci/unity-builder@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+        with:
+          projectPath: _unity_src/RIO54_Unity_WebGL
+          unityVersion: auto
+          targetPlatform: WebGL
+          buildName: RIO54-WebGL
+          buildsPath: build
+          buildMethod: RIO54BuildTools.GameCIBuildWebGL
+          allowDirtyBuild: true
+      - name: Include Noto CJK license notices
+        run: |
+          mkdir -p build/WebGL/ThirdPartyNotices/NotoCJK
+          cp _unity_src/RIO54_Unity_WebGL/Assets/Resources/Fonts/LICENSE_NotoSansCJKjp.txt build/WebGL/ThirdPartyNotices/NotoCJK/
+          cp _unity_src/RIO54_Unity_WebGL/Assets/Resources/Fonts/LICENSE_NotoSansCJKsc.txt build/WebGL/ThirdPartyNotices/NotoCJK/
+      - name: Validate compiled WebGL player
+        working-directory: _unity_src/RIO54_Unity_WebGL
+        run: python3 Tools/validate_webgl_output.py --path ../../build/WebGL
+      - name: Upload Unity WebGL player
+        uses: actions/upload-artifact@v4
+        with:
+          name: RIO54-Unity-WebGL
+          path: build/WebGL
+          if-no-files-found: error
+          retention-days: 30
