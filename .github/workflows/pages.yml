@@ -20,6 +20,7 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
+    timeout-minutes: 50
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -30,16 +31,22 @@ jobs:
       - name: Deep QA of HTML5, translations and PWA
         run: python3 Tools/verify_pages.py --site _site
       - name: Install Playwright Chromium
+        timeout-minutes: 12
         run: |
           python3 -m pip install --disable-pip-version-check "playwright==1.65.2"
-          python3 -m playwright install --with-deps chromium firefox webkit
+          python3 -m playwright install --with-deps chromium
       - name: Browser E2E — Android layout, 8 languages, gameplay and offline PWA
+        timeout-minutes: 12
         run: python3 Tools/test_browser.py --site _site
       - name: Verify browser E2E report
         run: |
           test -s artifacts/rio54-browser-e2e.json
           python3 -c "import json; r=json.load(open('artifacts/rio54-browser-e2e.json', encoding='utf-8')); g=r['gameplay']; assert r['result']=='passed'; assert len(g['completed_cases'])==4; assert g['clues_opened_total']==16; assert g['solved_cases']==4; assert g['archive_cards']==4; assert g['persisted_after_reload'] is True; assert r['pwa']['offline_reload']['hasGame'] is True; assert r['webgl']['canvas'] is True; assert len(r['responsive_matrix'])==5; assert all(x['scrollWidth']<=x['width']+1 for x in r['responsive_matrix']); assert all(x['primary_action_visible'] for x in r['responsive_matrix']); assert r['touch_targets']['minimum_height_px']==44; assert not r['page_errors']; print('Browser E2E report verified: 4 cases, 16 clues, offline PWA, WebGL and 5 viewport profiles.')"
+      - name: Install Firefox and WebKit
+        timeout-minutes: 12
+        run: python3 -m playwright install --with-deps firefox webkit
       - name: Cross-browser smoke test — Firefox and WebKit
+        timeout-minutes: 12
         run: python3 Tools/test_cross_browser.py --site _site
       - name: Verify Firefox and WebKit smoke report
         run: |
