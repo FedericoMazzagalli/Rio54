@@ -106,6 +106,48 @@ def main() -> int:
             locator.tap(timeout=10_000)
 
         no_horizontal_overflow("home")
+
+        # Exercise narrow phones, common Android widths and landscape layouts.
+        responsive_matrix = [
+            (320, 700, "compact-portrait"),
+            (360, 800, "small-portrait"),
+            (390, 844, "standard-portrait"),
+            (430, 932, "large-portrait"),
+            (844, 390, "compact-landscape"),
+        ]
+        responsive_results = []
+        for width, height, label in responsive_matrix:
+            page.set_viewport_size({"width": width, "height": height})
+            page.wait_for_timeout(80)
+            metrics = page.evaluate(
+                """() => ({
+                    width: window.innerWidth,
+                    height: window.innerHeight,
+                    scrollWidth: document.documentElement.scrollWidth,
+                    newGame: (() => {
+                        const r = document.querySelector('#newGame').getBoundingClientRect();
+                        return {x:r.x, y:r.y, width:r.width, height:r.height};
+                    })(),
+                    language: (() => {
+                        const r = document.querySelector('#languageSelect').getBoundingClientRect();
+                        return {x:r.x, y:r.y, width:r.width, height:r.height};
+                    })()
+                })"""
+            )
+            assert metrics["scrollWidth"] <= width + 1, f"horizontal overflow at {label}: {metrics}"
+            for element_name in ("newGame", "language"):
+                rect = metrics[element_name]
+                assert rect["width"] > 0 and rect["height"] >= 44, (
+                    f"{element_name} touch target is too small at {label}: {rect}"
+                )
+                assert rect["x"] >= -1 and rect["x"] + rect["width"] <= width + 1, (
+                    f"{element_name} is clipped at {label}: {rect}"
+                )
+            responsive_results.append({"profile": label, **metrics})
+        page.set_viewport_size({"width": 390, "height": 844})
+        report["responsive_matrix"] = responsive_results
+        report["touch_targets"] = {"minimum_height_px": 44, "new_game": "passed", "language_selector": "passed"}
+
         hero_texts = []
         for code in LOCALES:
             page.locator("#languageSelect").select_option(code)
