@@ -21,6 +21,16 @@ replacement = """dependencies {
 if anchor not in content:
     raise SystemExit("Could not find the expected dependency block in app/build.gradle")
 GRADLE.write_text(content.replace(anchor, replacement), encoding="utf-8")
+
+# WebViewAssetLoader resolves concrete APK asset files; do not precache a directory URL.
+service_worker = PROJECT / "app" / "src" / "main" / "assets" / "www" / "service-worker.js"
+worker_content = service_worker.read_text(encoding="utf-8")
+if "  './',\n" in worker_content:
+    worker_content = worker_content.replace("  './',\n", "")
+    service_worker.write_text(worker_content, encoding="utf-8")
+elif "  './'," not in worker_content:
+    raise SystemExit("Could not find the expected APP_SHELL root entry in service-worker.js")
+
 TEST_TARGET.parent.mkdir(parents=True, exist_ok=True)
 shutil.copy2(TEST_SOURCE, TEST_TARGET)
-print("Instrumentation source and stable AndroidX Test dependencies installed.")
+print("Instrumentation tests, AndroidX Test dependencies and WebView-safe offline cache installed.")
