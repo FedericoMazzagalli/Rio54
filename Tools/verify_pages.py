@@ -103,6 +103,14 @@ def main() -> None:
         match = re.search(re.escape(selector) + r"([^}]*)}", css)
         if not match or "min-height:44px" not in match.group(1):
             fail(f"mobile touch target is smaller than 44px: {selector[:-1]}")
+    for fragment, description in (
+        (".langpick select,.topright .btn{min-height:44px", "44px compact landscape touch targets"),
+        (".hero-actions .btn{min-height:44px", "44px compact start actions"),
+        (".langpick select{max-width:126px;min-height:44px", "44px compact language selector"),
+        (".topright .btn{min-height:44px", "44px compact top navigation"),
+    ):
+        if fragment not in css:
+            fail(f"mobile touch target regression: {description}")
     for rule, description in (
         (".playgrid{grid-template-columns:1fr}", "single-column investigation layout"),
         (".leads,.boardgrid{grid-template-columns:1fr}", "single-column clues and evidence board"),
