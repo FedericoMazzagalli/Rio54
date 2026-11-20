@@ -35,6 +35,10 @@ jobs:
           python3 -m playwright install --with-deps chromium
       - name: Browser E2E — Android layout, 8 languages, gameplay and offline PWA
         run: python3 Tools/test_browser.py --site _site
+      - name: Verify browser E2E report
+        run: |
+          test -s artifacts/rio54-browser-e2e.json
+          python3 -c "import json; r=json.load(open('artifacts/rio54-browser-e2e.json', encoding='utf-8')); g=r['gameplay']; assert r['result']=='passed'; assert len(g['completed_cases'])==4; assert g['clues_opened_total']==16; assert g['solved_cases']==4; assert g['archive_cards']==4; assert g['persisted_after_reload'] is True; assert r['pwa']['offline_reload']['hasGame'] is True; assert r['webgl']['canvas'] is True; assert not r['page_errors']; print('Browser E2E report verified: 4 cases, 16 clues, offline PWA and WebGL canvas.')"
       - name: Upload browser test diagnostics
         if: always()
         uses: actions/upload-artifact@v4

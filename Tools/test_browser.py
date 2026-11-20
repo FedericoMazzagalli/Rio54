@@ -268,3 +268,18 @@ def main() -> int:
                 browser.close()
             except Exception:
                 pass
+
+        if playwright is not None:
+            try:
+                playwright.stop()
+            except Exception:
+                pass
+        server.shutdown()
+        server.server_close()
+        thread.join(timeout=2)
+        report_path.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
+    return return_code
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
