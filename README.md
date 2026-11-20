@@ -60,6 +60,12 @@ El juego distingue entre observaciones, testimonios, documentos, hipótesis y co
 - Las traducciones se ofrecen para accesibilidad; para el análisis documental prevalecen las fuentes originales.
 
 
+## APK Android de depuración — compilación aprobada
+
+La primera APK Android ya fue compilada correctamente por GitHub Actions el **20/11/2026**. La ejecución [#44739024932](https://github.com/FedericoMazzagalli/Rio54/actions/runs/44739024932) terminó con éxito: JDK 17, Android SDK 36, Gradle 9.6.0, validación de los recursos y `assembleDebug` aprobados. El artefacto descargable es [RIO54-Android-debug-APK](https://github.com/FedericoMazzagalli/Rio54/actions/runs/44739024932/artifacts/14629443143).
+
+La APK es una compilación **debug** para pruebas manuales; no está firmada con una clave release de distribución. Falta instalarla y comprobarla en un teléfono Android físico.
+
 ## Aplicación Android instalable
 
 El paquete Android nativo v0.1.0 está disponible en [android/RIO54_Android_Offline_App_v0_1.zip](android/RIO54_Android_Offline_App_v0_1.zip). Es un contenedor Android WebView que lleva la edición HTML5 1.4.2 dentro del APK, con caché local y soporte de service worker mediante un origen HTTPS local. No es la compilación Unity ni una APK ya verificada en un teléfono físico.
